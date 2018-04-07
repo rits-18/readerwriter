@@ -2,40 +2,40 @@
 #include<pthread.h>
 #include<semaphore.h>
 
-sem_t readCountAccess;
-sem_t databaseAccess;
+sem_t rcAccess;
+sem_t dbAccess;
 int readCount=0;
 
 void *Writer(void *arg)
 {
-  sleep(1);
+  sleep(5);
   int temp=(int)arg;
   printf("\nWriter %d is trying to enter into database for modifying the data",temp);
-  sem_wait(&databaseAccess);
+  sem_wait(&dbAccess);
   printf("\nWriter %d is writting into the database",temp);
   printf("\nWriter %d is leaving the database");
-  sem_post(&databaseAccess);
+  sem_post(&dbAccess);
 }
 
 void *Reader(void *arg)
 {
   sleep(1);
   int temp=(int)arg;
-  printf(“\nReader %d is trying to enter into the Database for reading the data”,temp);
-  sem_wait(&readCountAccess);
+  printf("\nReader %d is trying to enter into the Database for reading the data",temp);
+  sem_wait(&rcAccess);
   readCount++;
   if(readCount==1)
   {
-    sem_wait(&databaseAccess);
-    printf(“\nReader %d is reading the database”,temp);
+    sem_wait(&dbAccess);
+    printf("\nReader %d is reading the database",temp);
   }
-  sem_post(&readCountAccess);
-  sem_wait(&readCountAccess);
-  readCount–;
+  sem_post(&rcAccess);
+  sem_wait(&rcAccess);
+  readCount--;
   if(readCount==0)
   {
-    printf(“\nReader %d is leaving the database”,temp);
-    sem_post(&databaseAccess);
+    printf("\nReader %d is leaving the database",temp);
+    sem_post(&dbAccess);
   }
-  sem_post(&readCountAccess);
+  sem_post(&rcAccess);
 }
